@@ -1,7 +1,14 @@
 {
   "name": "@orioro/expression-date",
   "version": "0.0.0-semantic-release",
-  "description": "",
+  "description": "Set of expressions aimed at solving common date-related operations. To be used with @orioro/expression module.",
+  "keywords": ["date", "expression", "date operations"],
+  "homepage": "https://github.com/orioro/node-expression-date",
+  "bugs": "https://github.com/orioro/node-expression-date/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/orioro/node-expression-date.git"
+  },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "scripts": {
@@ -20,8 +27,11 @@
     "prettier": "prettier src",
     "ci-check": "yarn test && yarn tsc:validate && yarn lint"
   },
-  "author": "",
+  "author": "Simon Fan <simon@orioro.design>",
   "license": "ISC",
+  "files": [
+    "dist/**/*"
+  ],
   "publishConfig": {
     "access": "public"
   },

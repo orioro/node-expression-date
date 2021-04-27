@@ -2,7 +2,11 @@
   "name": "@orioro/expression-date",
   "version": "0.0.0-semantic-release",
   "description": "Set of expressions aimed at solving common date-related operations. To be used with @orioro/expression module.",
-  "keywords": ["date", "expression", "date operations"],
+  "keywords": [
+    "date",
+    "expression",
+    "date operations"
+  ],
   "homepage": "https://github.com/orioro/node-expression-date",
   "bugs": "https://github.com/orioro/node-expression-date/issues",
   "repository": {
@@ -39,6 +43,7 @@
     "@babel/core": "^7.12.16",
     "@babel/preset-env": "^7.12.16",
     "@babel/preset-typescript": "^7.12.16",
+    "@orioro/jest-util-expression": "^1.0.3",
     "@orioro/readme": "^1.0.1",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^17.1.0",
@@ -73,7 +78,8 @@
     ]
   },
   "dependencies": {
-    "@orioro/expression": "^2.7.2",
+    "@orioro/expression": "^6.4.1",
+    "@orioro/typing": "^3.0.0",
     "luxon": "^1.26.0"
   }
 }

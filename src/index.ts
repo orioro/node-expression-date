@@ -2,9 +2,9 @@ import { DateTime } from 'luxon'
 
 import { ISODate, PlainObject } from './types'
 
-import { interpreter, ParamResolver } from '@orioro/expression'
+import { ParamResolver } from '@orioro/expression'
 
-import { validateType } from '@orioro/validate-type'
+import { validateType } from '@orioro/typing'
 
 export const DATE_ISO = 'ISO'
 export const DATE_ISO_DATE = 'ISODate'
@@ -243,14 +243,14 @@ const _serializeLuxonDate = (value, formatRaw: DateFormat) => {
  *         with the `parseFmtArgs`.
  * @returns {String | Number | Object | Date} date Output will vary according to `serializeFormat`
  */
-export const $date = interpreter(
+export const $date = [
   (
     serializeFormat: DateFormat = 'ISO',
     value: DateValue
   ): string | number | PlainObject | Date =>
     _serializeLuxonDate(_parseLuxonDate(value), serializeFormat),
-  [_VALIDATE_DATE_FORMAT, _VALIDATE_DATE_VALUE]
-)
+  [_VALIDATE_DATE_FORMAT, _VALIDATE_DATE_VALUE],
+]
 
 /**
  * Generates a ISO date string from `Date.now`
@@ -259,11 +259,11 @@ export const $date = interpreter(
  * @param {DateFormat} [serializeFormat='ISO']
  * @returns {String | Number | Object | Date} date
  */
-export const $dateNow = interpreter(
+export const $dateNow = [
   (serializeFormat: DateFormat = 'ISO'): string | number | PlainObject | Date =>
     _serializeLuxonDate(DateTime.fromMillis(Date.now()), serializeFormat),
-  [_VALIDATE_DATE_FORMAT]
-)
+  [_VALIDATE_DATE_FORMAT],
+]
 
 /**
  * Verifies whether the given date is valid.
@@ -279,7 +279,7 @@ export const $dateNow = interpreter(
  * @param {*}
  * @returns {Boolean} isValid
  */
-export const $dateIsValid = interpreter(
+export const $dateIsValid = [
   (value: DateValue): boolean => {
     try {
       return _parseLuxonDate(value).isValid
@@ -287,8 +287,8 @@ export const $dateIsValid = interpreter(
       return false
     }
   },
-  ['any']
-)
+  ['any'],
+]
 
 /**
  * @type {string | [string, string?]} DateUnitValue
@@ -310,7 +310,7 @@ const _parseZoneSensitiveOption = (unitValue: ZoneSensitiveOption) =>
  * @param {ISODate} [date=$$VALUE]
  * @returns {ISODate} date
  */
-export const $dateStartOf = interpreter(
+export const $dateStartOf = [
   (
     unitValue: DateUnitValue,
     serializeFormat: DateFormat = 'ISO',
@@ -322,8 +322,8 @@ export const $dateStartOf = interpreter(
       serializeFormat
     )
   },
-  [_VALIDATE_DATE_UNIT_VALUE, _VALIDATE_DATE_FORMAT, _VALIDATE_DATE_VALUE]
-)
+  [_VALIDATE_DATE_UNIT_VALUE, _VALIDATE_DATE_FORMAT, _VALIDATE_DATE_VALUE],
+]
 
 /**
  * Returns the date at the end of the given `unit` (e.g. `day`, `month`).
@@ -335,7 +335,7 @@ export const $dateStartOf = interpreter(
  * @param {ISODate} [date=$$VALUE]
  * @returns {ISODate} date
  */
-export const $dateEndOf = interpreter(
+export const $dateEndOf = [
   (
     unitValue: DateUnitValue,
     serializeFormat: DateFormat = 'ISO',
@@ -347,8 +347,8 @@ export const $dateEndOf = interpreter(
       serializeFormat
     )
   },
-  [_VALIDATE_DATE_UNIT_VALUE, _VALIDATE_DATE_FORMAT, _VALIDATE_DATE_VALUE]
-)
+  [_VALIDATE_DATE_UNIT_VALUE, _VALIDATE_DATE_FORMAT, _VALIDATE_DATE_VALUE],
+]
 
 /**
  * Modifies date specific `units` and returns resulting date.
@@ -371,7 +371,7 @@ export const $dateEndOf = interpreter(
  * @param {ISODate} [dateExp=$$VALUE]
  * @returns {ISODate} date
  */
-export const $dateSet = interpreter(
+export const $dateSet = [
   (
     values: ZoneSensitiveOption,
     serializeFormat: DateFormat = 'ISO',
@@ -384,8 +384,8 @@ export const $dateSet = interpreter(
       serializeFormat
     )
   },
-  [['object', 'array'], _VALIDATE_DATE_FORMAT, _VALIDATE_DATE_VALUE]
-)
+  [['object', 'array'], _VALIDATE_DATE_FORMAT, _VALIDATE_DATE_VALUE],
+]
 
 const _luxonConfigDate = (dt, config, value) => {
   switch (config) {
@@ -394,7 +394,7 @@ const _luxonConfigDate = (dt, config, value) => {
     case 'zone':
       return dt.setZone(value)
     default:
-      throw new Error(`Unknown DateTime config ${config}`)
+      throw new Error(`Unknown DateTime config '${config}'`)
   }
 }
 
@@ -408,7 +408,7 @@ const _luxonConfigDate = (dt, config, value) => {
  * @param {ISODate} [date=$$VALUE]
  * @returns {ISODate} date
  */
-export const $dateSetConfig = interpreter(
+export const $dateSetConfig = [
   (
     config: PlainObject,
     serializeFormat: DateFormat = 'ISO',
@@ -424,15 +424,14 @@ export const $dateSetConfig = interpreter(
       serializeFormat
     )
   },
-  ['object', _VALIDATE_DATE_FORMAT, _VALIDATE_DATE_VALUE]
-)
+  ['object', _VALIDATE_DATE_FORMAT, _VALIDATE_DATE_VALUE],
+]
 
-const _dateComparison = (compare) =>
-  interpreter(
-    (reference: ISODate, date: DateValue): boolean =>
-      compare(_parseLuxonDate(reference), _parseLuxonDate(date)),
-    [_VALIDATE_DATE_VALUE, _VALIDATE_DATE_VALUE]
-  )
+const _dateComparison = (compare) => [
+  (reference: ISODate, date: DateValue): boolean =>
+    compare(_parseLuxonDate(reference), _parseLuxonDate(date)),
+  [_VALIDATE_DATE_VALUE, _VALIDATE_DATE_VALUE],
+]
 
 /**
  * Greater than `date > reference`
@@ -488,15 +487,15 @@ export const $dateLte = _dateComparison((reference, date) => date <= reference)
  * @param {ISODate} [date=$$VALUE]
  * @returns {Boolean}
  */
-export const $dateEq = interpreter(
+export const $dateEq = [
   (
     reference: ISODate,
     compareUnit: string = 'millisecond',
     date: DateValue
   ): boolean =>
     _parseLuxonDate(reference).hasSame(_parseLuxonDate(date), compareUnit),
-  [_VALIDATE_DATE_VALUE, ['string', 'undefined'], _VALIDATE_DATE_VALUE]
-)
+  [_VALIDATE_DATE_VALUE, ['string', 'undefined'], _VALIDATE_DATE_VALUE],
+]
 
 /**
  * Modifies the date by moving it forward the duration specified.
@@ -506,15 +505,15 @@ export const $dateEq = interpreter(
  * @param {ISODate} [date=$$VALUE]
  * @returns {ISODate} date
  */
-export const $dateMoveForward = interpreter(
+export const $dateMoveForward = [
   (
     duration: PlainObject,
     serializeFormat: DateFormat = 'ISO',
     date: DateValue
   ): ISODate =>
     _serializeLuxonDate(_parseLuxonDate(date).plus(duration), serializeFormat),
-  ['object', _VALIDATE_DATE_FORMAT, _VALIDATE_DATE_VALUE]
-)
+  ['object', _VALIDATE_DATE_FORMAT, _VALIDATE_DATE_VALUE],
+]
 
 /**
  * Modifies the date by moving it backward the duration specified.
@@ -524,15 +523,15 @@ export const $dateMoveForward = interpreter(
  * @param {ISODate} [date=$$VALUE]
  * @returns {ISODate} date
  */
-export const $dateMoveBackward = interpreter(
+export const $dateMoveBackward = [
   (
     duration: PlainObject,
     serializeFormat: DateFormat = 'ISO',
     date: DateValue
   ): ISODate =>
     _serializeLuxonDate(_parseLuxonDate(date).minus(duration), serializeFormat),
-  ['object', _VALIDATE_DATE_FORMAT, _VALIDATE_DATE_VALUE]
-)
+  ['object', _VALIDATE_DATE_FORMAT, _VALIDATE_DATE_VALUE],
+]
 
 export const DATE_EXPRESSIONS = {
   $date,
